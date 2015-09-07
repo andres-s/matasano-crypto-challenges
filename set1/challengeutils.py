@@ -1,3 +1,4 @@
+import operator
 
 def xor(s1, s2):
     return ''.join(chr(ord(a) ^ ord(b)) for a, b in zip(s1, s2))
@@ -7,6 +8,11 @@ def score_key(key, ciphertext):
     key = key * len(ciphertext)
     res = xor(key, ciphertext)
     return (res, sum(1 for c in res if c in ('a', 'e', 'i', 'o', 'u')))
+
+
+def score_keys(ciphertext, n=3):
+    scores = ((chr(c), score_key(chr(c), ciphertext)[1]) for c in range(256))
+    return sorted(scores, key=operator.itemgetter(1), reverse=True)[:n]
 
 
 def ngrams(s, n):

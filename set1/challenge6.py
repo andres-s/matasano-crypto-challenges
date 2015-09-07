@@ -41,3 +41,37 @@
 # important. 
 
 
+import codecs
+import operator
+import challengeutils as utes
+
+with open('6.txt') as fp:
+    input = fp.readlines()
+
+input = ''.join(line.strip() for line in input)
+input = codecs.decode(input, 'base64')
+
+
+def normalised_dist(keysize, num_comparisons, s):
+    blocks = list(s[i*keysize:(i+1)*keysize] for i in range(2*num_comparisons))
+    block_pairs = zip(blocks[::2], blocks[1::2])
+    dists = map(lambda (fst, snd): utes.hamming_dist(fst, snd), block_pairs)
+    return float(sum(dists)) / float(len(dists) * keysize)
+
+
+keysize_dists = ((ksize, normalised_dist(ksize, 4, input))
+                 for ksize in range(2, 41))
+candidate_keysizes = sorted(keysize_dists,
+                            key=operator.itemgetter(1))[:3]
+
+for ksize, ksize_score in candidate_keysizes:
+    transposed_blocks = []
+    for i in range(ksize):
+        transposed_blocks.append(''.join(input[i::ksize]))
+
+    key = ''.join(utes.score_keys(txt, n=1)[0][0] for txt in transposed_blocks)
+
+    print(("For keysize {}, the best looking key is {}, "
+           "which decrypts text to:").format(ksize, key))
+    print(utes.repeating_key_xor(key, input[:50]) + "...\n")
+
