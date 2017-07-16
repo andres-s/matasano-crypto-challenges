@@ -1,18 +1,35 @@
 import operator
+from collections import namedtuple
+from collections import defaultdict
 
 def xor(s1, s2):
     return ''.join(chr(ord(a) ^ ord(b)) for a, b in zip(s1, s2))
 
+RELATIVE_LETTER_FREQUENCIES = [
+  ('e', 12),
+  ('t', 9),
+  ('a', 8),
+  ('o', 8),
+  ('i', 8),
+  ('n', 7),
+  ('s', 7),
+  ('r', 6),
+]
+LETTER_TO_FREQ = defaultdict(int)
+for letter, relative_frequency in RELATIVE_LETTER_FREQUENCIES:
+    LETTER_TO_FREQ[letter] = relative_frequency
 
 def score_key(key, ciphertext):
     key = key * len(ciphertext)
     res = xor(key, ciphertext)
-    return (res, sum(1 for c in res if c in ('a', 'e', 'i', 'o', 'u')))
+    return (res, sum(LETTER_TO_FREQ[c] for c in res))
 
+PotentialKey = namedtuple('PotentialKey', ['key', 'score'])
 
 def score_keys(ciphertext, n=3):
-    scores = ((chr(c), score_key(chr(c), ciphertext)[1]) for c in range(256))
-    return sorted(scores, key=operator.itemgetter(1), reverse=True)[:n]
+    keys = (PotentialKey(key=chr(c), score=score_key(chr(c), ciphertext)[1])
+            for c in range(256))
+    return sorted(keys, key=operator.itemgetter(1), reverse=True)[:n]
 
 
 def ngrams(s, n):

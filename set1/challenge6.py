@@ -75,3 +75,6 @@ for ksize, ksize_score in candidate_keysizes:
            "which decrypts text to:").format(ksize, key))
     print(utes.repeating_key_xor(key, input[:50]) + "...\n")
 
+THE_KEY = 'Terminator X: Bring the noise'
+print('The key "{}" decrypts the text to:'.format(THE_KEY))
+print(utes.repeating_key_xor(THE_KEY, input))
