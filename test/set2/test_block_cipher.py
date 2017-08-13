@@ -33,3 +33,11 @@ class TestBlockCipher(unittest.TestCase):
     def test_encrypt_single_block(self):
         block_cipher = BlockCipher(ReverseCipher(), AlphabetShiftMode('aaaa'))
         self.assertEqual(block_cipher.encrypt('abcd'), 'dcba')
+
+    def test_encrypt_single_block_nonzero_init_vector(self):
+        block_cipher = BlockCipher(ReverseCipher(), AlphabetShiftMode('abcd'))
+        self.assertEqual(block_cipher.encrypt('abcd'), 'geca')
+
+    def test_encrypt_two_blocks(self):
+        block_cipher = BlockCipher(ReverseCipher(), AlphabetShiftMode('abcd'))
+        self.assertEqual(block_cipher.encrypt('abcdefgh'), 'gecahijk')

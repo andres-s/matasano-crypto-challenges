@@ -1,3 +1,5 @@
+from exceptions import Exception
+
 def pad_pkcs_7(text, padded_length):
     bytes_to_pad = padded_length - len(text)
     return text + chr(bytes_to_pad) * bytes_to_pad
@@ -34,6 +36,20 @@ class BlockCipher:
         idx = 0
         while idx < len(text):
             next_block_start_idx = idx + block_size
+            if next_block_start_idx > len(text):
+                raise Exception('need to add padding')
             blocks.append(text[idx:next_block_start_idx])
             idx = next_block_start_idx
         return blocks
+
+
+class CBCMode:
+    def __init__(self, initialisation_vector):
+        pass
+
+    def mix_block(self, block, mixing_block):
+        return xor(block, mixing_block)
+
+
+def xor(string_1, string_2):
+    return ''.join(chr(ord(a) ^ ord(b)) for a, b in zip(string_1, string_2))
