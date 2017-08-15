@@ -92,3 +92,12 @@ def _multiply(p, q):
         curr_term = _multiply_by_x(curr_term)
         q = q >> 1
     return product
+
+def add_round_key(state, round_key):
+    next_state = [4 * [None], 4 * [None], 4 * [None], 4 * [None]]
+    for col_idx in range(STATE_NUM_COLS):
+        for row_idx in range(STATE_NUM_ROWS):
+            old = ord(state[row_idx][col_idx])
+            key = ord(round_key[STATE_NUM_ROWS * col_idx + row_idx])
+            next_state[row_idx][col_idx] = chr(old ^ key)
+    return next_state

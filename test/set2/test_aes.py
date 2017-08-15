@@ -56,3 +56,22 @@ class TestMixColumns(unittest.TestCase):
                      [chr(0x15), chr(0x92), chr(0x29), chr(0x1a)] ]
 
         self.assertEqual(aes.mix_columns(state), expected)
+
+class TestAddRoundKey(unittest.TestCase):
+    def test_add_round_key(self):
+        state = [ [chr(0x04), chr(0xe0), chr(0x48), chr(0x28)],
+                  [chr(0x66), chr(0xcb), chr(0xf8), chr(0x06)],
+                  [chr(0x81), chr(0x19), chr(0xd3), chr(0x26)],
+                  [chr(0xe5), chr(0x9a), chr(0x7a), chr(0x4c)] ]
+
+        round_key = [chr(0xa0), chr(0xfa), chr(0xfe), chr(0x17),
+                     chr(0x88), chr(0x54), chr(0x2c), chr(0xb1),
+                     chr(0x23), chr(0xa3), chr(0x39), chr(0x39),
+                     chr(0x2a), chr(0x6c), chr(0x76), chr(0x05)]
+
+        expected = [ [chr(0xa4), chr(0x68), chr(0x6b), chr(0x02)],
+                     [chr(0x9c), chr(0x9f), chr(0x5b), chr(0x6a)],
+                     [chr(0x7f), chr(0x35), chr(0xea), chr(0x50)],
+                     [chr(0xf2), chr(0x2b), chr(0x43), chr(0x49)] ]
+
+        self.assertEqual(aes.add_round_key(state, round_key), expected)
