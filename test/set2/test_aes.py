@@ -31,6 +31,19 @@ class TestShiftRows(unittest.TestCase):
         self.assertEqual(aes.shift_rows(state), expected)
 
 class TestMixColumns(unittest.TestCase):
+    def test_mix_columns_identity_matrix(self):
+        state = [ [chr(0x1), chr(0x0), chr(0x0), chr(0x0)],
+                  [chr(0x0), chr(0x1), chr(0x0), chr(0x0)],
+                  [chr(0x0), chr(0x0), chr(0x1), chr(0x0)],
+                  [chr(0x0), chr(0x0), chr(0x0), chr(0x1)] ]
+
+        expected = [ [chr(0x2), chr(0x3), chr(0x1), chr(0x1)],
+                     [chr(0x1), chr(0x2), chr(0x3), chr(0x1)],
+                     [chr(0x1), chr(0x1), chr(0x2), chr(0x3)],
+                     [chr(0x3), chr(0x1), chr(0x1), chr(0x2)] ]
+
+        self.assertEqual(aes.mix_columns(state), expected)
+
     def test_mix_columns(self):
         state = [ [chr(0x63), chr(0x09), chr(0xcd), chr(0xba)],
                   [chr(0x53), chr(0x60), chr(0x70), chr(0xca)],

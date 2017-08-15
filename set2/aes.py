@@ -1,4 +1,5 @@
 from set2.substitutionbox import AES_SUBSTITUTION_BOX
+
 class AES128:
     def __init__(self, key):
         self._key = key
@@ -43,18 +44,51 @@ def shift_rows(state):
 def _cycle_row_left(arr, cycle_distance):
     return arr[cycle_distance:] + arr[0:cycle_distance]
 
+STATE_NUM_ROWS = 4
+STATE_NUM_COLS = 4
+
 def mix_columns(state):
-    pass
+    next_state = [4 * [None], 4 * [None], 4 * [None], 4 * [None]]
+    for col_idx in range(0, STATE_NUM_COLS):
+        mixed_column = _mix_column(state, col_idx)
+        _set_column(next_state, col_idx, mixed_column)
+    return next_state
+
+def _mix_column(state, col_idx):
+    col= (
+        ord(state[0][col_idx]),
+        ord(state[1][col_idx]),
+        ord(state[2][col_idx]),
+        ord(state[3][col_idx]),
+    )
+    return (
+        chr(_multiply(2, col[0]) ^ _multiply(3, col[1]) ^ col[2] ^ col[3]),
+        chr(col[0] ^ _multiply(2, col[1]) ^ _multiply(3, col[2]) ^ col[3]),
+        chr(col[0] ^ col[1] ^ _multiply(2, col[2]) ^ _multiply(3, col[3])),
+        chr(_multiply(3, col[0]) ^ col[1] ^ col[2] ^ _multiply(2, col[3])),
+    )
+
+def _set_column(state, col_idx, new_column):
+    for row_idx in range(0, STATE_NUM_ROWS):
+        state[row_idx][col_idx] = new_column[row_idx]
 
 MAX_BYTE = 255
-MINIMAL_POLYNOMIAL = 0x1b
+MINIMAL_POLYNOMIAL = 0x11b
 
 def _multiply_by_x(p):
+    # p is in the polynomial field F(2**8)
     product = p << 1
     if product > MAX_BYTE:
-        product ^ MINIMAL_POLYNOMIAL
+        product = product ^ MINIMAL_POLYNOMIAL
     return product
 
 def _multiply(p, q):
+    # p, q are in the polynomial field F(2**8)
     product = 0
-    
+    curr_term = p
+    while q > 0:
+        if q & 1 == 1:
+            product = product ^ curr_term
+        curr_term = _multiply_by_x(curr_term)
+        q = q >> 1
+    return product
