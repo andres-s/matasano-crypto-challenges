@@ -28,6 +28,13 @@ class AES128:
 
     #  return state
 
+def expand_key(key):
+    num_words_in_key = len(key) // 4
+    key_in_uint32 = []
+    for key_idx in range(0, len(key), 4):
+        uint32_word = (key[key_idx] << 24
+        key_in_words.append(key[
+
 def sub_bytes(state):
     next_state = [[AES_SUBSTITUTION_BOX[b] for b in row] for row in state]
     return next_state
