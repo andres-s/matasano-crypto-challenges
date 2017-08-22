@@ -1,8 +1,12 @@
 from set2.substitutionbox import AES_SUBSTITUTION_BOX
 
+RCON_SIZE = 11
+
 class AES128:
     def __init__(self, key):
         self._key = key
+        self._expanded_key = expand_key(self._key, num_rounds??)
+        self._RCON = _build_rcon()
 
     def encrypt(self, plaintext):
         pass
@@ -10,30 +14,75 @@ class AES128:
     def decrypt(self, ciphertext):
         pass
 
-#  def aes128(block, key):
-    #  state = block
+    def _expanded_key(self):
+        if self._exp
 
-    #  add_round_key(state, ???)
+def aes128(block, key):
+    state = block
 
-    #  NUM_ROUNDS = 10
-    #  for round in range(NUM_ROUNDS - 1):
-        #  state = sub_bytes(state)
-        #  state = shift_rows(state)
-        #  state = mix_columns(state)
-        #  state = add_round_key(state, ???)
+    add_round_key(state, ???)
 
-    #  state = sub_bytes(state)
-    #  state = shift_rows(state)
-    #  state = add_round_key(state, ???)
+    NUM_ROUNDS = 10
+    for round in range(NUM_ROUNDS - 1):
+        state = sub_bytes(state)
+        state = shift_rows(state)
+        state = mix_columns(state)
+        state = add_round_key(state, ???)
 
-    #  return state
+    state = sub_bytes(state)
+    state = shift_rows(state)
+    state = add_round_key(state, ???)
 
-def expand_key(key):
+    return state
+
+def expand_key(key, num_rounds):
     num_words_in_key = len(key) // 4
-    key_in_uint32 = []
+    expanded_key_in_uint32 = []
     for key_idx in range(0, len(key), 4):
-        uint32_word = (key[key_idx] << 24
-        key_in_words.append(key[
+        uint32_word = (key[key_idx] << 24) + (key[key_idx + 1] << 16) +
+                      (key[key_idx + 2] << 8) + key[key_idx + 3]
+        expanded_key_in_uint32.append(uint32_word)
+
+    num_words_in_expanded_key = STATE_NUM_UINT32 * (num_rounds + 1)
+    for key_idx in range(num_words_in_key, num_words_in_expanded_key):
+        temp = expanded_key_in_uint32[-1]
+        if key_idx % num_words_in_key == 0:
+            round_constant = self._RCON[key_idx/num_words_in_key - 1]
+            temp = _sub_word(_rot_word(temp)) ^ round_constant
+        else if num_words_in_key > 6 and key_idx % num_words_key == 4:
+            temp = _sub_word(temp)
+        next_uint32 = temp ^ expanded_key_in_uint32[key_idx - num_words_in_key]
+        expanded_key_in_uint32.append(next_uint32)
+
+    return expanded_key_in_uint32
+
+def _sub_word(word_uint32):
+    bites = []
+    for bit_offset in [24, 16, 8, 0]:
+        bite = (word_uint32 >> bit_offset) & 0xff
+        bites.append(bite)
+
+    bites = [ord(AES_SUBSTITUTION_BOX[chr(bite)]) for bite in bites]
+
+    sub_word = 0
+    for bite in bites:
+        sub_word = (sub_word << 8) + bite
+
+    return sub_word
+
+def _rot_word(word_uint32):
+    bottom_24_bits = word_uint32 & 0x00ffffff
+    top_8_bits = word_uint32 >> 24
+    return (bottom_24_bits << 8) + top_8_bits
+
+def _build_rcon():
+    uint32_words = [1 << 24]
+    top_8_bits = 1
+    for _ in range(1, RCON_SIZE):
+        uint32_word = top_8_bits << 24
+        uint32_words.append(uint32_word)
+        top_8_bits = _multiply_by_x(top_8_bits)
+    return uint32_words
 
 def sub_bytes(state):
     next_state = [[AES_SUBSTITUTION_BOX[b] for b in row] for row in state]
