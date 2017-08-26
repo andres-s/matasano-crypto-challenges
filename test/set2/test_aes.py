@@ -75,3 +75,17 @@ class TestAddRoundKey(unittest.TestCase):
                      [chr(0xf2), chr(0x2b), chr(0x43), chr(0x49)] ]
 
         self.assertEqual(aes.add_round_key(state, round_key), expected)
+
+class TestExpandKey(unittest.TestCase):
+    def test_expand_128_bit_key(self):
+        key = [chr(0x2b), chr(0x7e), chr(0x15), chr(0x16),
+               chr(0x28), chr(0xae), chr(0xd2), chr(0xa6),
+               chr(0xab), chr(0xf7), chr(0x15), chr(0x88),
+               chr(0x09), chr(0xcf), chr(0x4f), chr(0x3c)]
+
+        expanded = [
+
+        self.assertEqual(aes.expand_key(key, 10), 
+
+            # 192 -> 12 rounds
+            # 258 -> 14 rounds

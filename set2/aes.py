@@ -39,8 +39,8 @@ def expand_key(key, num_rounds):
     num_words_in_key = len(key) // 4
     expanded_key_in_uint32 = []
     for key_idx in range(0, len(key), 4):
-        uint32_word = (key[key_idx] << 24) + (key[key_idx + 1] << 16) +
-                      (key[key_idx + 2] << 8) + key[key_idx + 3]
+        uint32_word = (ord(key[key_idx]) << 24) + (ord(key[key_idx + 1]) << 16) +
+                      (ord(key[key_idx + 2]) << 8) + ord(key[key_idx + 3])
         expanded_key_in_uint32.append(uint32_word)
 
     num_words_in_expanded_key = STATE_NUM_UINT32 * (num_rounds + 1)
@@ -54,7 +54,12 @@ def expand_key(key, num_rounds):
         next_uint32 = temp ^ expanded_key_in_uint32[key_idx - num_words_in_key]
         expanded_key_in_uint32.append(next_uint32)
 
-    return expanded_key_in_uint32
+    expanded_key = []
+    for uint32_word in expanded_key_in_uint32:
+        for bite in _uint32_word_to_chr_array(uint32_word):
+            expanded_key.append(bite)
+
+    return expanded_key
 
 def _sub_word(word_uint32):
     bites = []
@@ -83,6 +88,14 @@ def _build_rcon():
         uint32_words.append(uint32_word)
         top_8_bits = _multiply_by_x(top_8_bits)
     return uint32_words
+
+def _uint32_word_to_chr_array(word):
+    return [
+        chr(word >> 24),
+        chr((word >> 16) & 0xff),
+        chr((word >> 8) & 0xff),
+        chr(word & 0xff),
+    ]
 
 def sub_bytes(state):
     next_state = [[AES_SUBSTITUTION_BOX[b] for b in row] for row in state]
