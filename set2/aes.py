@@ -1,12 +1,14 @@
 from set2.substitutionbox import AES_SUBSTITUTION_BOX
 
-RCON_SIZE = 11
+NUM_ROUNDS_AES128 = 10
+
+RCON = [0x01000000, 0x02000000, 0x04000000, 0x08000000, 0x10000000,
+        0x20000000, 0x40000000, 0x80000000, 0x1b000000, 0x36000000]
 
 class AES128:
     def __init__(self, key):
         self._key = key
-        self._expanded_key = expand_key(self._key, num_rounds??)
-        self._RCON = _build_rcon()
+        self._expanded_key = expand_key(self._key, NUM_ROUNDS_AES128)
 
     def encrypt(self, plaintext):
         pass
@@ -14,24 +16,22 @@ class AES128:
     def decrypt(self, ciphertext):
         pass
 
-    def _expanded_key(self):
-        if self._exp
 
 def aes128(block, key):
     state = block
 
-    add_round_key(state, ???)
+    #  add_round_key(state, ???)
 
     NUM_ROUNDS = 10
     for round in range(NUM_ROUNDS - 1):
         state = sub_bytes(state)
         state = shift_rows(state)
         state = mix_columns(state)
-        state = add_round_key(state, ???)
+        #  state = add_round_key(state, ???)
 
     state = sub_bytes(state)
     state = shift_rows(state)
-    state = add_round_key(state, ???)
+    #  state = add_round_key(state, ???)
 
     return state
 
@@ -39,17 +39,17 @@ def expand_key(key, num_rounds):
     num_words_in_key = len(key) // 4
     expanded_key_in_uint32 = []
     for key_idx in range(0, len(key), 4):
-        uint32_word = (ord(key[key_idx]) << 24) + (ord(key[key_idx + 1]) << 16) +
-                      (ord(key[key_idx + 2]) << 8) + ord(key[key_idx + 3])
+        uint32_word = ((ord(key[key_idx]) << 24) + (ord(key[key_idx + 1]) << 16) +
+                       (ord(key[key_idx + 2]) << 8) + ord(key[key_idx + 3]))
         expanded_key_in_uint32.append(uint32_word)
 
     num_words_in_expanded_key = STATE_NUM_UINT32 * (num_rounds + 1)
     for key_idx in range(num_words_in_key, num_words_in_expanded_key):
         temp = expanded_key_in_uint32[-1]
         if key_idx % num_words_in_key == 0:
-            round_constant = self._RCON[key_idx/num_words_in_key - 1]
+            round_constant = RCON[key_idx/num_words_in_key - 1]
             temp = _sub_word(_rot_word(temp)) ^ round_constant
-        else if num_words_in_key > 6 and key_idx % num_words_key == 4:
+        elif num_words_in_key > 6 and key_idx % num_words_key == 4:
             temp = _sub_word(temp)
         next_uint32 = temp ^ expanded_key_in_uint32[key_idx - num_words_in_key]
         expanded_key_in_uint32.append(next_uint32)
@@ -80,14 +80,6 @@ def _rot_word(word_uint32):
     top_8_bits = word_uint32 >> 24
     return (bottom_24_bits << 8) + top_8_bits
 
-def _build_rcon():
-    uint32_words = [1 << 24]
-    top_8_bits = 1
-    for _ in range(1, RCON_SIZE):
-        uint32_word = top_8_bits << 24
-        uint32_words.append(uint32_word)
-        top_8_bits = _multiply_by_x(top_8_bits)
-    return uint32_words
 
 def _uint32_word_to_chr_array(word):
     return [
@@ -115,6 +107,7 @@ def _cycle_row_left(arr, cycle_distance):
 
 STATE_NUM_ROWS = 4
 STATE_NUM_COLS = 4
+STATE_NUM_UINT32 = 4
 
 def mix_columns(state):
     next_state = [4 * [None], 4 * [None], 4 * [None], 4 * [None]]
